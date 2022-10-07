@@ -343,7 +343,7 @@ String processor(const String &var) {
 
 
 void onRootRequest(AsyncWebServerRequest *request) {
-  request->send(SPIFFS, "/index.html", "text/html", false, processor);
+  request->send(SPIFFS, "/car.html", "text/html", false, processor);
 }
 
 void initWebServer() {
