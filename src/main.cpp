@@ -110,6 +110,7 @@ Button button      = { BTN_PIN, HIGH, 0, 0 };
 // *************
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
     AwsFrameInfo *info = (AwsFrameInfo*)arg;
+    Serial.printf("handleWebSocketMessage\n");
     /*
     if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
 
@@ -132,6 +133,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
     */
 }
 
+
 void onEvent(AsyncWebSocket       *server,
              AsyncWebSocketClient *client,
              AwsEventType          type,
@@ -139,7 +141,10 @@ void onEvent(AsyncWebSocket       *server,
              uint8_t              *data,
              size_t                len) {
 
-    switch (type) {
+              Serial.printf("WebSocket onEvent\n");
+    switch (type) 
+    {
+      
         case WS_EVT_CONNECT:
             Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
             break;
@@ -147,6 +152,8 @@ void onEvent(AsyncWebSocket       *server,
             Serial.printf("WebSocket client #%u disconnected\n", client->id());
             break;
         case WS_EVT_DATA:
+
+            Serial.printf("WebSocket data: #%d\n",len);
             handleWebSocketMessage(arg, data, len);
             break;
         case WS_EVT_PONG:
@@ -155,10 +162,14 @@ void onEvent(AsyncWebSocket       *server,
     }
 }
 
-void initWebSocket() {
+void initWebSocket() 
+{
+  
     ws.onEvent(onEvent);
     server.addHandler(&ws);
 }
+
+
 
 ///motor motion
 void moveForward(){
@@ -342,19 +353,20 @@ String processor(const String &var) {
 }
 
 
-void onRootRequest(AsyncWebServerRequest *request) {
+void onRootRequest(AsyncWebServerRequest *request) 
+{
   request->send(SPIFFS, "/car.html", "text/html", false, processor);
 }
 
 void initWebServer() {
     server.on("/", onRootRequest);
-    server.serveStatic("/", SPIFFS, "/");
+    server.serveStatic("/", SPIFFS, "/").setDefaultFile("car.html");
     server.begin();
 }
 
 void notifyClients() 
 {
-  Serial.printf("notifyClients");
+  Serial.println("notifyClients");
   return;
     const uint8_t size = JSON_OBJECT_SIZE(1);
     StaticJsonDocument<size> json;
@@ -411,6 +423,8 @@ Serial.begin(115200);
 
 void loop() 
 {
+  
+
  ws.cleanupClients();
    button.read();
 
